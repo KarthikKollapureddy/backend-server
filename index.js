@@ -7,6 +7,10 @@ require('dotenv').config();
  
 const app = express();
 app.use(cors());
+app.use(cors({
+    origin: "https://payment.vrnfoods.com", // Replace with your frontend URL
+    methods: ["GET", "POST"]
+}));
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -34,22 +38,14 @@ app.get('/createorder', async(req, res)=>{
                 "customer_email": "shruthi@gmail.com",
                 "customer_phone": "9999949999"
             },
-            "order_meta": {
-                "return_url": "https://test.cashfree.com/pgappsdemos/return.php?order_id=order_123"
-            },
             "order_note": ""
         }
 
-        Cashfree.PGCreateOrder("2023-08-01", request).then(response => {
-            // console.log(response.data);
-            res.json(response.data);
-
-        }).catch(error => {
-            console.error(error.response.data.message);
-        })
-
-    }catch(err){
-        console.log('createOrder err',err)
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        res.json(response.data);
+    }catch(error){
+        console.error("Error creating order:", error.message || error);
+        res.status(500).json({ message: "Failed to create order", error: error.message || error });
     }
 
 })
@@ -60,29 +56,30 @@ app.post('/verify', (req,res)=>{
         let {
             orderId
         } = req.body;
+        
+        if (!orderId) {
+            return res.status(400).json({ message: "orderId is required" });
+        }
 
-        Cashfree.PGOrderFetchPayments("2023-08-01", orderId).then((response) => {
+        Cashfree.PGOrderFetchPayments("2023-08-01", orderId)
+        .then((response) => {
             res.json(response.data);
-        }).catch(error => {
-            console.error("varifiaction error chashfree",error.response.data.message);
         })
+        .catch((error) => {
+            console.error("Verification error:", error.message || error);
+            res.status(500).json({ message: "Failed to verify payment", error: error.message || error });
+        });
 
     }catch(error){
-        console.log("varification error",error)
+        console.error("Verification route error:", error.message || error);
+        res.status(500).json({ message: "Internal server error", error: error.message || error });
     }
 
 })
 
 
 function getOrderId(){
-    const uniqueId = crypto.randomBytes(16).toString('hex');
-
-    const hash = crypto.createHash('sha256');
-    hash.update(uniqueId);
-
-    const orderId = hash.digest('hex');
-
-    return orderId.substr(0, 12)
+    return `order_${crypto.randomBytes(6).toString('hex')}`;
 }
 
 
