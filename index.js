@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(cors({
-    origin: "*", // Replace with your frontend URL
+    origin: "https://nice-tree-040962210.4.azurestaticapps.net", // Replace with your frontend URL
     methods: ["GET", "POST"]
 }));
 app.use(express.json());
