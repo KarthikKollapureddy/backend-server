@@ -7,38 +7,40 @@ require('dotenv').config();
  
 const app = express();
 app.use(cors());
-app.use(cors({
-    origin: "https://payment.vrnfoods.com", // Replace with your frontend URL
-    methods: ["GET", "POST"]
-}));
+// app.use(cors({
+//     origin: "https://payment.vrnfoods.com", // Replace with your frontend URL
+//     methods: ["GET", "POST"]
+// }));
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
 
-Cashfree.XClientId = process.env.CLIENT_ID;
-Cashfree.XClientSecret = process.env.CLIENT_SECRET;
-Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
+Cashfree.XClientId = process.env.CLIENT_ID_TESTING;
+Cashfree.XClientSecret = process.env.CLIENT_SECRET_TESTING;
+Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
 
 
 app.get('/', (req, res)=>{
     res.send('hello World')
 })
 
-app.get('/createorder', async(req, res)=>{
+app.post('/createorder', async(req, res)=>{
 
     try{
+        let {
+            order_amount,
+            order_currency,
+            customer_details,
+            order_note
+        } = req.body
+        
         var request = {
-            "order_amount": "10",
-            "order_currency": "INR",
+            "order_amount": order_amount,
+            "order_currency": order_currency,
             "order_id":  await getOrderId(),
-            "customer_details": {
-                "customer_id": "shruthi07",
-                "customer_name": "ShruthiBS",
-                "customer_email": "shruthi@gmail.com",
-                "customer_phone": "9999949999"
-            },
-            "order_note": ""
+            "customer_details": customer_details,
+            "order_note": order_note
         }
 
         const response = await Cashfree.PGCreateOrder("2023-08-01", request);
