@@ -16,9 +16,13 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-Cashfree.XClientId = process.env.CLIENT_ID_TESTING;
-Cashfree.XClientSecret = process.env.CLIENT_SECRET_TESTING;
-Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+// Cashfree.XClientId = process.env.CLIENT_ID_TESTING;
+// Cashfree.XClientSecret = process.env.CLIENT_SECRET_TESTING;
+// Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+
+Cashfree.XClientId = process.env.CLIENT_ID;
+Cashfree.XClientSecret = process.env.CLIENT_SECRET;
+Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
 
 
 app.get('/', (req, res)=>{
